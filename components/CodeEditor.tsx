@@ -1,7 +1,8 @@
  "use client"
+import { LangType } from "@/types";
 import Editor from "@monaco-editor/react";
 
-export default function CodeEditor() {
+const CodeEditor = ({language}: {language: LangType}) => {
   const initialCode = `<html>
   <head>
     <title>HTML Sample</title>
@@ -23,9 +24,13 @@ export default function CodeEditor() {
   return (
     <Editor
       height="100%"
-      defaultLanguage="html"
+      defaultLanguage = "html"
       defaultValue= {initialCode}
-      theme="light"
+      theme="vs-dark"
+      language={language}
     />
+   
   );
 }
+
+export default CodeEditor
