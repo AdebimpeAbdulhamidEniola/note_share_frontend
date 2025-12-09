@@ -1,8 +1,14 @@
- "use client"
-import { LangType } from "@/types";
+"use client";
+import { LangType, ThemeType } from "@/types";
 import Editor from "@monaco-editor/react";
 
-const CodeEditor = ({language}: {language: LangType}) => {
+const CodeEditor = ({
+  language,
+  themeType,
+}: {
+  language: LangType;
+  themeType: ThemeType;
+}) => {
   const initialCode = `<html>
   <head>
     <title>HTML Sample</title>
@@ -20,17 +26,19 @@ const CodeEditor = ({language}: {language: LangType}) => {
     <h1>Heading No.1</h1>
     <input disabled type="button" value="Click me" />
   </body>
-</html>`
+</html>`;
   return (
     <Editor
       height="100%"
-      defaultLanguage = "html"
-      defaultValue= {initialCode}
-      theme="vs-dark"
+      defaultLanguage="html"
+      defaultValue={initialCode}
+      theme={themeType}
       language={language}
+      options={{
+        minimap: { enabled: false },
+      }}
     />
-   
   );
-}
+};
 
-export default CodeEditor
+export default CodeEditor;

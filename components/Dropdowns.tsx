@@ -25,7 +25,7 @@ export const LanguageDropDowns = () => {
 };
 
 export const DropDownThemes = () => {
-  const themes = ["vs", "vs-dark", "hc-black"];
+  const themes = ["light", "vs-dark", "hc-black"];
   const dropDownThemes = themes.map((theme) => (
     <option key={theme} value={theme}>
       {theme}
