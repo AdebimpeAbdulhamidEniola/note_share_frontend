@@ -39,7 +39,7 @@ const ShareButton = ({
     },
     onSuccess: (data) => {
       //when POST succeeds, data contains the snippet with the ID
-      console.log(`Successful ${data}`)
+      console.log('Successful', data)
       const shareUrl = `${window.location.origin}/${data.id}`;
       if (myRef.current) {
         myRef.current.value = shareUrl;
