@@ -74,7 +74,7 @@ const EditorWrapper = () => {
           <DropDownThemes />
         </select>
 
-        <ShareButton />
+        <ShareButton code={code} language={language} theme={theme}/>
       </div>
     </div>
   );

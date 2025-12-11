@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image";
 import {
   Dialog,
@@ -8,7 +10,19 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useRef } from "react";
-const ShareButton = () => {
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { SnippetCreatePayload } from "@/types";
+import { createSnippet } from "@/lib/snippetsApi";
+
+const ShareButton = ({
+  code,
+  language,
+  theme,
+}: {
+  code: string;
+  language: string;
+  theme: string;
+}) => {
   const myRef = useRef<HTMLInputElement>(null);
   const handleCopy = () => {
     if (myRef.current) {
@@ -17,10 +31,35 @@ const ShareButton = () => {
     }
   };
 
+  const mutation = useMutation({
+    //This what i want to happen when the user click share
+    mutationFn: async () => {
+      const payload: SnippetCreatePayload = {code, language, theme}
+      return await createSnippet(payload)
+    },
+    onSuccess: (data) => {
+      //when POST succeeds, data contains the snippet with the ID
+      console.log(`Successful ${data}`)
+      const shareUrl = `${window.location.origin}/${data.id}`;
+      if (myRef.current) {
+        myRef.current.value = shareUrl;
+      }
+    },
+    onError: (error) => {
+      console.error("Failed to share", error)
+    }
+
+  })
+  const handleShare = async () => {
+    //this triggers the mutation
+    mutation.mutate();
+  }
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="bg-[#406AFF] hover:bg-[#1639B0] font-bold py-1.5 px-3 md:py-2 md:px-4 rounded-lg ml-auto flex gap-1.5 md:gap-2 items-center whitespace-nowrap text-sm md:text-base" onClick={}>
+        <button className="bg-[#406AFF] hover:bg-[#1639B0] font-bold py-1.5 px-3 md:py-2 md:px-4 rounded-lg ml-auto flex gap-1.5 md:gap-2 items-center whitespace-nowrap text-sm md:text-base"
+        onClick={handleShare}
+        >
           <Image
             src="/resources/Share.svg"
             alt="share-icon"
@@ -50,7 +89,10 @@ const ShareButton = () => {
               className="text-white  grow"
               ref={myRef}
             />
-            <button className=" bg-purple-500 hover:bg-purple-700 text-white p-1.5 cursor-pointer rounded-sm" onClick={handleCopy}>
+            <button
+              className=" bg-purple-500 hover:bg-purple-700 text-white p-1.5 cursor-pointer rounded-sm"
+              onClick={handleCopy}
+            >
               Copy Link
             </button>
           </div>
