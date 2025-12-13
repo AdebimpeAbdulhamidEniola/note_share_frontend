@@ -28,6 +28,7 @@ const EditorWrapper = () => {
   const [language, setLanguage] = useState<LangType>("html");
   const [theme, setTheme] = useState<ThemeType>("light");
   const [code, setCode] = useState<string>(initialCode);
+  const [unsavedChanges, setUnsavedChanges] = useState(false)
 
   const langTypeHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
     console.log(event.target.value);
@@ -41,6 +42,7 @@ const EditorWrapper = () => {
   const handleEditorChange = (value: string | undefined) => {
     console.log(value)
     setCode(value || "");
+    setUnsavedChanges(true)
   };
 
   return (
@@ -59,22 +61,22 @@ const EditorWrapper = () => {
         />
       </div>
       
-      <div className="absolute bottom-4 left-4 right-4 flex gap-2 md:gap-3 items-center bg-[#fffffe] py-2">
+      <div className="absolute bottom-3 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 flex gap-1 sm:gap-2 md:gap-3 items-center bg-[#fffffe] py-1 sm:py-2">
         <select
-          className="rounded-xl px-2 py-1.5 bg-[#ced6e1] text-sm md:text-base"
+          className="rounded-lg sm:rounded-xl px-1.5 sm:px-2 py-1 sm:py-1.5 bg-[#ced6e1] text-xs sm:text-sm md:text-base"
           onChange={langTypeHandler}
         >
           <LanguageDropDowns />
         </select>
 
         <select
-          className="rounded-xl px-2 py-1.5 bg-[#ced6e1] text-sm md:text-base"
+          className="rounded-lg sm:rounded-xl px-1.5 sm:px-2 py-1 sm:py-1.5 bg-[#ced6e1] text-xs sm:text-sm md:text-base"
           onChange={themeTypeHndler}
         >
           <DropDownThemes />
         </select>
 
-        <ShareButton code={code} language={language} theme={theme}/>
+        <ShareButton code={code} language={language} theme={theme} unsavedChanges = {unsavedChanges} setUnsavedChanges = {setUnsavedChanges}/>
       </div>
     </div>
   );

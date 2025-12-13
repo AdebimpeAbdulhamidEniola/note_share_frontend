@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,19 +10,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { SnippetCreatePayload } from "@/types";
+import { ApiResponse, SnippetCreatePayload } from "@/types";
 import { createSnippet } from "@/lib/snippetsApi";
 
 const ShareButton = ({
   code,
   language,
   theme,
+  unsavedChanges,
+  setUnsavedChanges,
 }: {
   code: string;
   language: string;
   theme: string;
+  unsavedChanges: boolean;
+  setUnsavedChanges: (value: boolean) => void;
 }) => {
   const myRef = useRef<HTMLInputElement>(null);
   const handleCopy = () => {
@@ -29,43 +34,61 @@ const ShareButton = ({
       myRef.current.select();
       document.execCommand("copy");
     }
+    setIsCopy(true);
   };
+
+  const [url, setUrl] = useState("");
+  const [isCopy, setIsCopy] = useState(false);
 
   const mutation = useMutation({
     //This what i want to happen when the user click share
-    mutationFn: async () => {
-      const payload: SnippetCreatePayload = {code, language, theme}
-      return await createSnippet(payload)
+    mutationFn: async (payload: SnippetCreatePayload) => {
+      const result = await createSnippet(payload);
+      if (!result) {
+        console.log("Failed to create snippet")
+      }
+      return result;
     },
-    onSuccess: (data) => {
+    onSuccess: (result: ApiResponse) => {
       //when POST succeeds, data contains the snippet with the ID
-      console.log('Successful', data)
-      const shareUrl = `${window.location.origin}/${data.id}`;
+      const { data } = result;
+      console.log("data is", data?.id);
+      const shareUrl = `${window.location.origin}/${data?.id}`;
+      console.log(shareUrl);
       if (myRef.current) {
+        setUrl(shareUrl);
         myRef.current.value = shareUrl;
       }
+      // mark that there are no unsaved changes after successful share
+      setUnsavedChanges(false);
     },
     onError: (error) => {
-      console.error("Failed to share", error)
-    }
-
-  })
+      console.error("Failed to share", error);
+    },
+  });
   const handleShare = async () => {
     //this triggers the mutation
-    mutation.mutate();
-  }
+    const payload: SnippetCreatePayload = { code, language, theme };
+    mutation.mutate(payload);
+  };
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="bg-[#406AFF] hover:bg-[#1639B0] font-bold py-1.5 px-3 md:py-2 md:px-4 rounded-lg ml-auto flex gap-1.5 md:gap-2 items-center whitespace-nowrap text-sm md:text-base"
-        onClick={handleShare}
+        <button
+          className={`font-bold py-1 px-2 sm:py-1.5 sm:px-3 md:py-2 md:px-4 rounded-lg ml-auto flex gap-1 sm:gap-1.5 md:gap-2 items-center whitespace-nowrap text-xs sm:text-sm md:text-base ${
+            !unsavedChanges
+              ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+              : "bg-[#406AFF] hover:bg-[#1639B0] text-white"
+          }`}
+          onClick={handleShare}
+          disabled={!unsavedChanges}
         >
           <Image
             src="/resources/Share.svg"
             alt="share-icon"
-            width={14}
-            height={14}
-            className="md:w-4 md:h-4"
+            width={12}
+            height={12}
+            className="sm:w-3.5 sm:h-3.5 md:w-4 md:h-4"
           />
           <span className="text-white">Share</span>
         </button>
@@ -84,17 +107,21 @@ const ShareButton = ({
             </label>
             <input
               id="link"
-              defaultValue="https://ui.shadcn.com/docs/installation"
               readOnly
-              className="text-white  grow"
+              className="text-blue grow flex"
               ref={myRef}
+              value={url}
             />
-            <button
-              className=" bg-purple-500 hover:bg-purple-700 text-white p-1.5 cursor-pointer rounded-sm"
+            <Button
+              className={`text-white p-1.5 cursor-pointer rounded-sm md: ${
+                isCopy
+                  ? "bg-green-500 hover:bg-green-700"
+                  : "bg-purple-500 hover:bg-purple-700"
+              }`}
               onClick={handleCopy}
             >
-              Copy Link
-            </button>
+              {isCopy ? "Copied" : "Copy"}
+            </Button>
           </div>
         </div>
       </DialogContent>

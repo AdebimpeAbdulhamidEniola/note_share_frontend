@@ -40,3 +40,10 @@ export type Snippet = {
   createdAt: string;
   updatedAt: string;
 };
+
+export interface ApiResponse {
+  status: number;
+  message: string;
+  data: Snippet | null;
+
+}
