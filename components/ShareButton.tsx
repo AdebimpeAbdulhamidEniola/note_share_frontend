@@ -21,12 +21,14 @@ const ShareButton = ({
   theme,
   unsavedChanges,
   setUnsavedChanges,
+  fromBackend
 }: {
   code: string;
   language: string;
   theme: string;
   unsavedChanges: boolean;
   setUnsavedChanges: (value: boolean) => void;
+  fromBackend?:boolean
 }) => {
   const myRef = useRef<HTMLInputElement>(null);
   const handleCopy = () => {
@@ -43,11 +45,7 @@ const ShareButton = ({
   const mutation = useMutation({
     //This what i want to happen when the user click share
     mutationFn: async (payload: SnippetCreatePayload) => {
-      const result = await createSnippet(payload);
-      if (!result) {
-        console.log("Failed to create snippet")
-      }
-      return result;
+      return await createSnippet(payload);
     },
     onSuccess: (result: ApiResponse) => {
       //when POST succeeds, data contains the snippet with the ID
@@ -71,24 +69,25 @@ const ShareButton = ({
     const payload: SnippetCreatePayload = { code, language, theme };
     mutation.mutate(payload);
   };
+  const isDisabled = !unsavedChanges || fromBackend;
   return (
     <Dialog>
       <DialogTrigger asChild>
         <button
-          className={`font-bold py-1 px-2 sm:py-1.5 sm:px-3 md:py-2 md:px-4 rounded-lg ml-auto flex gap-1 sm:gap-1.5 md:gap-2 items-center whitespace-nowrap text-xs sm:text-sm md:text-base ${
-            !unsavedChanges
+          className={`font-bold py-1.5 px-3 pr-2 md:py-2 md:px-4 rounded-lg ml-auto flex gap-1.5 md:gap-2 items-center whitespace-nowrap text-sm md:text-[10px] md:text-base ${
+            isDisabled
               ? "bg-gray-300 text-gray-600 cursor-not-allowed"
               : "bg-[#406AFF] hover:bg-[#1639B0] text-white"
           }`}
           onClick={handleShare}
-          disabled={!unsavedChanges}
+          disabled={isDisabled}
         >
           <Image
             src="/resources/Share.svg"
             alt="share-icon"
-            width={12}
-            height={12}
-            className="sm:w-3.5 sm:h-3.5 md:w-4 md:h-4"
+            width={14}
+            height={14}
+            className="md:w-4 md:h-4"
           />
           <span className="text-white">Share</span>
         </button>

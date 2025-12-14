@@ -1,17 +1,20 @@
 "use client";
-import { LangType, ThemeType } from "@/types";
+import { LangType} from "@/types";
 import Editor from "@monaco-editor/react";
+import { ReadonlyURLSearchParams } from "next/navigation";
 
 const CodeEditor = ({
   language,
   themeType,
   value,
   onChange,
+  readOnly = false
 }: {
   language: LangType;
-  themeType: ThemeType;
+  themeType: string;
   value: string;
   onChange: (value: string | undefined) => void;
+  readOnly?: boolean
 }) => {
   return (
     <Editor
@@ -23,6 +26,8 @@ const CodeEditor = ({
       onChange={onChange}
       options={{
         minimap: { enabled: false },
+        readOnly: readOnly,
+        domReadOnly: readOnly
       }}
     />
   );
