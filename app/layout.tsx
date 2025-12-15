@@ -11,7 +11,7 @@ const outfit = Outfit({
 });
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  console.log(`This is the api url ${process.env.API_URL}`)
+  console.log(`This is the api url ${process.env.NEXT_PUBLIC_API_URL}`)
   const queryClient = new QueryClient();
   return (
     <html lang="en">
